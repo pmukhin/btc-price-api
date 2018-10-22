@@ -1,0 +1,18 @@
+version: '3.1'
+
+services:
+    api:
+        image: com.tookitaki/btc-price-api:latest
+        depends_on:
+            - mariadb
+        ports:
+            - 8080:8080
+
+    mariadb:
+        image: mariadb
+        restart: always
+        environment:
+          MYSQL_ROOT_PASSWORD: admin1
+          MYSQL_DATABASE: btc_rates
+        ports:
+            - 3306:3306
