@@ -39,7 +39,7 @@ object RatesApp extends App {
   pricesRdd
     .map(r => (r.value.toDouble, DateTime.parse(r.date)))
     .map(r => tupleEncoder.apply(r))
-    .collect()
+    .collect
     .map(d => new ProducerRecord[String, String]("rates", d.toString()))
     .foreach(producer.send)
 }
