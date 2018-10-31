@@ -43,7 +43,6 @@ object ServerApp extends StreamApp[IO] with Logging {
 
     startConsumer()
 
-    val config = ConfigFactory.load("application.conf")
     val database = DatabaseConfig.forConfig[MySQLProfile]("database", config)
     val rates = new RateRepositoryImpl(database)
 
