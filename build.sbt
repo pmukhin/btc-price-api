@@ -67,8 +67,15 @@ lazy val sparkRatesDownloader = (project in file("spark-rates-downloader"))
     libraryDependencies ++= Seq(
       "org.apache.spark" % "spark-core_2.11",
       "org.apache.spark" % "spark-sql_2.11",
-      "org.apache.spark" % "spark-streaming_2.11"
-    ).map(_ % SparkVersion % "provided")
+      "org.apache.spark" % "spark-streaming_2.11",
+    ).map(_ % SparkVersion % "provided") ++ Seq(
+      "io.circe" %% "circe-core" % CirceVersion,
+      "io.circe" %% "circe-parser" % CirceVersion,
+      "io.circe" %% "circe-generic" % CirceVersion,
+      "joda-time" % "joda-time" % "2.10.1"
+    ) ++ Seq(
+      "org.apache.kafka" % "kafka_2.11" % "0.10.1.0"
+    )
   )
   .disablePlugins(sbtdocker.DockerPlugin, UniversalPlugin, JavaAppPackaging)
   .settings(

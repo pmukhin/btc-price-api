@@ -24,7 +24,6 @@ class RatesService(rateRepository: RateRepository)
   implicit val ioErrorResponseEncoder: EntityEncoder[IO, ErrorResponse] = jsonEncoderOf[IO, ErrorResponse]
 
   val service: HttpService[IO] = HttpService[IO] {
-
     case GET -> Root / date =>
       val dateTime = DateTime parse date
       rateRepository
