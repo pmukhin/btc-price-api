@@ -11,4 +11,13 @@ build-app:
 restart: build-app
 	$(DOCKER)-compose down ; $(DOCKER)-compose up -d
 
+sparkjars-clean:
+	rm -f ./sparkjars/*.jar
+
+sparkapp: sparkjars-clean
+	$(SBT) "project sparkRatesDownloader" assembly ; cp spark-rates-downloader/target/scala-2.12/btc-price-api-assembly-*.jar ./sparkjars/btc-price-api-assembly.jar
+
+sparkapp-submit:
+	$(DOCKER) exec -it spark-master /spark/bin/spark-submit --verbose /lib/jars/btc-price-api-assembly.jar
+
 all: build-app run-schema
