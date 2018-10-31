@@ -10,13 +10,15 @@ val MySqlConnVersion = "8.0.11"
 val JodaVersion = "2.10"
 val SlickJodaMapperVersion = "2.3.0"
 val CirceVersion = "0.10.0"
+val SparkVersion = "2.2.0"
 
 lazy val root = (project in file("."))
   .settings(
     organization := "com.tookitaki",
     name := "btc-price-api",
     version := "0.0.1-SNAPSHOT",
-    scalaVersion := "2.12.6",
+    scalaVersion := "2.12.3",
+    sbtVersion := "1.0.0",
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
       "org.http4s" %% "http4s-circe" % Http4sVersion,
@@ -56,7 +58,39 @@ lazy val root = (project in file("."))
   )
 
 lazy val sparkRatesDownloader = (project in file("spark-rates-downloader"))
-  .settings()
-
-lazy val sparkRatesProcessor = (project in file("spark-rates-processor"))
-  .settings()
+  .settings(
+    organization := "com.tookitaki",
+    name := "btc-price-api",
+    version := "0.0.1-SNAPSHOT",
+    scalaVersion := "2.12.3",
+    sbtVersion := "1.0.0",
+    libraryDependencies ++= Seq(
+      "org.apache.spark" % "spark-core_2.11",
+      "org.apache.spark" % "spark-sql_2.11",
+      "org.apache.spark" % "spark-streaming_2.11"
+    ).map(_ % SparkVersion % "provided")
+  )
+  .disablePlugins(sbtdocker.DockerPlugin, UniversalPlugin, JavaAppPackaging)
+  .settings(
+    assemblyMergeStrategy in assembly := {
+      case PathList("org", "aopalliance", xs@_*) => MergeStrategy.last
+      case PathList("javax", "inject", xs@_*) => MergeStrategy.last
+      case PathList("javax", "servlet", xs@_*) => MergeStrategy.last
+      case PathList("javax", "activation", xs@_*) => MergeStrategy.last
+      case PathList("org", "apache", xs@_*) => MergeStrategy.last
+      case PathList("io", "circe", xs@_*) => MergeStrategy.last
+      case PathList("com", "google", xs@_*) => MergeStrategy.last
+      case PathList("com", "esotericsoftware", xs@_*) => MergeStrategy.last
+      case PathList("com", "codahale", xs@_*) => MergeStrategy.last
+      case PathList("com", "yammer", xs@_*) => MergeStrategy.last
+      case "about.html" => MergeStrategy.rename
+      case "META-INF/ECLIPSEF.RSA" => MergeStrategy.last
+      case "META-INF/mailcap" => MergeStrategy.last
+      case "META-INF/mimetypes.default" => MergeStrategy.last
+      case "plugin.properties" => MergeStrategy.last
+      case "log4j.properties" => MergeStrategy.last
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    }
+  )
