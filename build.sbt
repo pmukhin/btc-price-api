@@ -2,6 +2,7 @@ import sbtdocker.mutable.Dockerfile
 import sbtdocker.DockerPlugin.autoImport._
 import com.typesafe.sbt.SbtNativePackager.autoImport.executableScriptName
 
+val ScalaVersion = "2.11.9"
 val Http4sVersion = "0.18.19"
 val Specs2Version = "4.1.0"
 val LogbackVersion = "1.2.3"
@@ -12,12 +13,14 @@ val SlickJodaMapperVersion = "2.3.0"
 val CirceVersion = "0.10.0"
 val SparkVersion = "2.2.0"
 
+val kafkaDependencies = Seq("org.apache.kafka" % "kafka_2.11" % "0.10.1.0")
+
 lazy val root = (project in file("."))
   .settings(
     organization := "com.tookitaki",
     name := "btc-price-api",
     version := "0.0.1-SNAPSHOT",
-    scalaVersion := "2.12.3",
+    scalaVersion := ScalaVersion,
     sbtVersion := "1.0.0",
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
@@ -31,7 +34,7 @@ lazy val root = (project in file("."))
       "com.typesafe.slick" %% "slick" % SlickVersion,
       "com.typesafe.slick" %% "slick-hikaricp" % SlickVersion,
       "mysql" % "mysql-connector-java" % MySqlConnVersion,
-    ),
+    ) ++ kafkaDependencies,
     addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.6"),
     addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4")
   )
@@ -62,20 +65,18 @@ lazy val sparkRatesDownloader = (project in file("spark-rates-downloader"))
     organization := "com.tookitaki",
     name := "btc-price-api",
     version := "0.0.1-SNAPSHOT",
-    scalaVersion := "2.12.3",
+    scalaVersion := ScalaVersion,
     sbtVersion := "1.0.0",
     libraryDependencies ++= Seq(
-      "org.apache.spark" % "spark-core_2.11",
-      "org.apache.spark" % "spark-sql_2.11",
-      "org.apache.spark" % "spark-streaming_2.11",
+      "org.apache.spark" %% "spark-core",
+      "org.apache.spark" %% "spark-sql",
+      "org.apache.spark" %% "spark-streaming",
     ).map(_ % SparkVersion % "provided") ++ Seq(
       "io.circe" %% "circe-core" % CirceVersion,
       "io.circe" %% "circe-parser" % CirceVersion,
       "io.circe" %% "circe-generic" % CirceVersion,
       "joda-time" % "joda-time" % "2.10.1"
-    ) ++ Seq(
-      "org.apache.kafka" % "kafka_2.11" % "0.10.1.0"
-    )
+    ) ++ kafkaDependencies
   )
   .disablePlugins(sbtdocker.DockerPlugin, UniversalPlugin, JavaAppPackaging)
   .settings(
