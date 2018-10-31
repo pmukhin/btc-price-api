@@ -4,15 +4,18 @@ services:
     api:
         image: com.tookitaki/btc-price-api:latest
         depends_on:
-            - mariadb
+            - database
         ports:
             - 8080:8080
 
-    mariadb:
+    database:
         image: mariadb
         restart: always
+        container_name: mariadb
         environment:
-          MYSQL_ROOT_PASSWORD: admin1
-          MYSQL_DATABASE: btc_rates
+            MYSQL_ROOT_PASSWORD: admin1
+            MYSQL_DATABASE: btc_rates
+        volumes:
+            - ${PWD}/schema.sql:/var/config/schema.sql
         ports:
             - 3306:3306

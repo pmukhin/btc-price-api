@@ -7,6 +7,9 @@ val Specs2Version = "4.1.0"
 val LogbackVersion = "1.2.3"
 val SlickVersion = "3.2.3"
 val MySqlConnVersion = "8.0.11"
+val JodaVersion = "2.10"
+val SlickJodaMapperVersion = "2.3.0"
+val CirceVersion = "0.10.0"
 
 lazy val root = (project in file("."))
   .settings(
@@ -18,6 +21,9 @@ lazy val root = (project in file("."))
       "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
       "org.http4s" %% "http4s-circe" % Http4sVersion,
       "org.http4s" %% "http4s-dsl" % Http4sVersion,
+      "io.circe" %% "circe-generic" % CirceVersion,
+      "joda-time" % "joda-time" % JodaVersion,
+      "com.github.tototoshi" %% "slick-joda-mapper" % SlickJodaMapperVersion,
       "org.specs2" %% "specs2-core" % Specs2Version % "test",
       "ch.qos.logback" % "logback-classic" % LogbackVersion,
       "com.typesafe.slick" %% "slick" % SlickVersion,
@@ -49,3 +55,8 @@ lazy val root = (project in file("."))
     )
   )
 
+lazy val sparkRatesDownloader = (project in file("spark-rates-downloader"))
+  .settings()
+
+lazy val sparkRatesProcessor = (project in file("spark-rates-processor"))
+  .settings()
