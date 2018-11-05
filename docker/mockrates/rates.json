@@ -1,0 +1,12 @@
+{
+  "data": {
+    "base": "BTC",
+    "currency": "USD",
+    "prices": [
+      {
+        "price": "6411.15",
+        "time": "2018-11-05T00:00:00Z"
+      }
+    ]
+  }
+}

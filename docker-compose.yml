@@ -1,6 +1,12 @@
 version: '3.1'
 
 services:
+    mockrates:
+        build:
+            context: ./docker/mockrates
+        ports:
+            - 8086:8086
+
     api:
         image: com.tookitaki/btc-price-api:latest
         depends_on:
