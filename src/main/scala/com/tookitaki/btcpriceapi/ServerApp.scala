@@ -11,8 +11,6 @@ import slick.basic.DatabaseConfig
 import slick.jdbc.MySQLProfile
 import slick.util.Logging
 
-import scala.reflect.internal.util.Collections
-
 object ServerApp extends StreamApp[IO] with Logging {
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,10 +28,7 @@ object ServerApp extends StreamApp[IO] with Logging {
       override def run(): Unit = {
         while (true) {
           val records = kafkaConsumer.poll(1000)
-
-          for (record <- records) {
-            // logic to unjsonify record and push it to db
-          }
+          // logic to unjsonify record and push it to db
         }
       }
     })

@@ -6,7 +6,7 @@ services:
         depends_on:
             - database
         ports:
-            - 8080:8080
+            - 8097:8097
 
     database:
         image: mariadb
@@ -32,8 +32,8 @@ services:
         ports:
           - 50070:50070
 
-      datanode:
-    image: bde2020/hadoop-datanode:1.1.0-hadoop2.8-java8
+    datanode:
+        image: bde2020/hadoop-datanode:1.1.0-hadoop2.8-java8
         depends_on:
           - namenode
         volumes:

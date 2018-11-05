@@ -1,3 +1,5 @@
 .idea
 target
 sparkjars/*.jar
+data/datanode/*
+data/namenode/*

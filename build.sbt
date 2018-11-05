@@ -12,8 +12,14 @@ val JodaVersion = "2.10"
 val SlickJodaMapperVersion = "2.3.0"
 val CirceVersion = "0.10.0"
 val SparkVersion = "2.2.0"
+val CucumberVersion = "2.0.1"
 
 val kafkaDependencies = Seq("org.apache.kafka" % "kafka_2.11" % "0.10.1.0")
+
+resolvers ++= Seq(
+  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+)
 
 lazy val root = (project in file("."))
   .settings(
@@ -33,7 +39,7 @@ lazy val root = (project in file("."))
       "ch.qos.logback" % "logback-classic" % LogbackVersion,
       "com.typesafe.slick" %% "slick" % SlickVersion,
       "com.typesafe.slick" %% "slick-hikaricp" % SlickVersion,
-      "mysql" % "mysql-connector-java" % MySqlConnVersion,
+      "mysql" % "mysql-connector-java" % MySqlConnVersion
     ) ++ kafkaDependencies,
     addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.6"),
     addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4")
@@ -59,6 +65,8 @@ lazy val root = (project in file("."))
       pullBaseImage = BuildOptions.Pull.IfMissing
     )
   )
+  .aggregate(kafkaServices)
+  .dependsOn(kafkaServices)
 
 lazy val sparkRatesDownloader = (project in file("spark-rates-downloader"))
   .settings(
@@ -70,7 +78,7 @@ lazy val sparkRatesDownloader = (project in file("spark-rates-downloader"))
     libraryDependencies ++= Seq(
       "org.apache.spark" %% "spark-core",
       "org.apache.spark" %% "spark-sql",
-      "org.apache.spark" %% "spark-streaming",
+      "org.apache.spark" %% "spark-streaming"
     ).map(_ % SparkVersion % "provided") ++ Seq(
       "io.circe" %% "circe-core" % CirceVersion,
       "io.circe" %% "circe-parser" % CirceVersion,
@@ -101,4 +109,43 @@ lazy val sparkRatesDownloader = (project in file("spark-rates-downloader"))
         val oldStrategy = (assemblyMergeStrategy in assembly).value
         oldStrategy(x)
     }
+  )
+
+lazy val kafkaServices = (project in file("kafka-services"))
+  .disablePlugins(sbtdocker.DockerPlugin, UniversalPlugin, JavaAppPackaging)
+  .settings(
+    organization := "com.tookitaki",
+    name := "kafka-services",
+    version := "0.0.1-SNAPSHOT",
+    scalaVersion := ScalaVersion,
+    sbtVersion := "1.0.0",
+    libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % "1.3.2"
+    ) ++ kafkaDependencies
+  )
+
+
+lazy val sparkRatesDownloaderItSpec = (project in file("spark-rates-downloader-specs"))
+  .disablePlugins(sbtdocker.DockerPlugin, UniversalPlugin, JavaAppPackaging)
+  .settings(
+    organization := "com.tookitaki",
+    scalaVersion := ScalaVersion,
+    name := "btc-price-api-itspec",
+    libraryDependencies := Seq(
+      "io.cucumber" % "cucumber-core" % CucumberVersion % "test",
+      "io.cucumber" % "cucumber-junit" % CucumberVersion % "test",
+      "io.cucumber" %% "cucumber-scala" % CucumberVersion % "test",
+      "org.scalatest" %% "scalatest" % "3.2.0-SNAP7" % Test,
+      "org.apache.kafka" % "kafka_2.11" % "0.10.1.0" % "test",
+      "com.typesafe" % "config" % "1.3.2"
+    )
+  )
+  .enablePlugins(CucumberPlugin)
+  .settings(
+    fork in Test := true,
+    CucumberPlugin.monochrome := false,
+    CucumberPlugin.glue := "com/tookitaki/rates/itapp",
+    CucumberPlugin.features := List("spark-rates-downloader-specs/src/test/resources/features/"),
+    CucumberPlugin.beforeAll := { () => println("** Regression Test **") },
+    CucumberPlugin.afterAll := { () => println("** Test Completed **") }
   )

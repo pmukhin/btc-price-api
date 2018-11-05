@@ -6,11 +6,13 @@ import slick.lifted.Tag
 import slick.jdbc.H2Profile.api._
 
 object Implicits {
-  implicit val rateEncoder: Encoder[Rate] = (r: Rate) => Json.obj(
-    ("id", r.id.map(Json.fromInt).getOrElse(Json.Null)),
-    ("value", Json.fromDouble(r.value).getOrElse(Json.Null)),
-    ("dateLabel", Json.fromString(r.dateLabel.toString))
-  )
+  implicit val rateEncoder: Encoder[Rate] = new Encoder[Rate] {
+    override def apply(r: Rate): Json = Json.obj(
+      ("id", r.id.map(Json.fromInt).getOrElse(Json.Null)),
+      ("value", Json.fromDouble(r.value).getOrElse(Json.Null)),
+      ("dateLabel", Json.fromString(r.dateLabel.toString))
+    )
+  }
 }
 
 case class Rate(id: Option[Int], value: Double, dateLabel: DateTime)
